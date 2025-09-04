@@ -2,9 +2,16 @@ import { neon } from '@netlify/neon';
 
 const sql = neon();
 
-export default async () => {
+export default async (req) => {
   try {
-    const [row] = await sql`SELECT NOW() AS current_time;`;
+    const { name, age } = await req.json();
+
+    const [row] = await sql`
+      INSERT INTO test_data (name, age)
+      VALUES (${name}, ${age})
+      RETURNING *;
+    `;
+
     return Response.json({ success: true, row });
   } catch (err) {
     return Response.json({ success: false, error: err.message }, { status: 500 });
